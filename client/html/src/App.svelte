@@ -68,7 +68,6 @@
     });
 
     alt.on("handling:setVisibility", (state) => {
-      console.log("state update", state);
       visible = state;
     });
   }
