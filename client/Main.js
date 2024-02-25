@@ -81,6 +81,8 @@ function resetVehicleHandling() {
 
   vehicle.handling.reset();
   updateFormData();
+
+  alt.emitServer("handling:reset");
 }
 
 function copyVehicleHandling() {
@@ -139,9 +141,9 @@ function openMenu() {
     handle.on("handling:copy", copyVehicleHandling.bind(this));
 
     webviewHandle = handle;
-    updateFormData();
   }
 
+  updateFormData();
   webviewHandle.emit("handling:setVisibility", true);
   alt.showCursor(true);
   alt.toggleGameControls(false);
@@ -176,4 +178,11 @@ alt.onServer("handling:sync", (vehicleId, data) => {
 
     vehicle.handling[key] = parseFloat(value) || value;
   }
+});
+
+alt.onServer("handling:reset", (vehicleId, data) => {
+  const vehicle = alt.Vehicle.getByRemoteID(vehicleId);
+  if (!vehicle) return;
+
+  vehicle.handling.reset();
 });
