@@ -2,7 +2,7 @@
 
 ### Preview
 
-<img src="https://i.imgur.com/UAVbDMb.png" alt="Preview" />
+<img src="https://i.imgur.com/UAVbDMb.png" alt="Preview" height="350" />
 
 ### Install
 Put the downloaded folder in `resources`, then start it by adding as a startup resource in `server.toml` or using the `start` command.
