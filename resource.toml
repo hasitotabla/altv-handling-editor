@@ -1,0 +1,4 @@
+type = 'js'
+main = 'server/Main.js'
+client-main = 'client/Main.js'
+client-files = [ 'client/*' ]
