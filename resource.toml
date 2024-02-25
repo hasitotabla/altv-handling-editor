@@ -1,4 +1,4 @@
 type = 'js'
 main = 'server/Main.js'
 client-main = 'client/Main.js'
-client-files = [ 'client/*' ]
+client-files = [ 'client/Main.js', 'client/html/public/*', 'shared/*' ]

@@ -1,4 +1,7 @@
+<!-- svelte-ignore a11y-click-events-have-key-events -->
 <script lang="ts">
+  import { HANDLING_PROPERTY_DESCRIPTIONS } from "./HandlingProperties";
+
   type HandlingValue = string | number;
 
   let visible = false;
@@ -8,69 +11,9 @@
       modelDefault: HandlingValue;
       value: HandlingValue;
     };
-  } = {
-    acceleration: { modelDefault: 0, value: 0 },
-    antiRollBarBiasFront: { modelDefault: 0, value: 0 },
-    antiRollBarBiasRear: { modelDefault: 0, value: 0 },
-    antiRollBarForce: { modelDefault: 0, value: 0 },
-    brakeBiasFront: { modelDefault: 0, value: 0 },
-    brakeBiasRear: { modelDefault: 0, value: 0 },
-    brakeForce: { modelDefault: 0, value: 0 },
-    camberStiffnesss: { modelDefault: 0, value: 0 },
-    centreOfMassOffset: { modelDefault: 0, value: 0 },
-    clutchChangeRateScaleDownShift: { modelDefault: 0, value: 0 },
-    clutchChangeRateScaleUpShift: { modelDefault: 0, value: 0 },
-    collisionDamageMult: { modelDefault: 0, value: 0 },
-    damageFlags: { modelDefault: 0, value: 0 },
-    deformationDamageMult: { modelDefault: 0, value: 0 },
-    downforceModifier: { modelDefault: 0, value: 0 },
-    driveBiasFront: { modelDefault: 0, value: 0 },
-    driveInertia: { modelDefault: 0, value: 0 },
-    driveMaxFlatVel: { modelDefault: 0, value: 0 },
-    engineDamageMult: { modelDefault: 0, value: 0 },
-    handBrakeForce: { modelDefault: 0, value: 0 },
-    handlingFlags: { modelDefault: 0, value: 0 },
-    inertiaMultiplier: { modelDefault: 0, value: 0 },
-    initialDragCoeff: { modelDefault: 0, value: 0 },
-    initialDriveForce: { modelDefault: 0, value: 0 },
-    initialDriveGears: { modelDefault: 0, value: 0 },
-    initialDriveMaxFlatVel: { modelDefault: 0, value: 0 },
-    lowSpeedTractionLossMult: { modelDefault: 0, value: 0 },
-    mass: { modelDefault: 0, value: 0 },
-    modelFlags: { modelDefault: 0, value: 0 },
-    monetaryValue: { modelDefault: 0, value: 0 },
-    oilVolume: { modelDefault: 0, value: 0 },
-    percentSubmerged: { modelDefault: 0, value: 0 },
-    percentSubmergedRatio: { modelDefault: 0, value: 0 },
-    petrolTankVolume: { modelDefault: 0, value: 0 },
-    rollCentreHeightFront: { modelDefault: 0, value: 0 },
-    rollCentreHeightRear: { modelDefault: 0, value: 0 },
-    seatOffsetDistX: { modelDefault: 0, value: 0 },
-    seatOffsetDistY: { modelDefault: 0, value: 0 },
-    seatOffsetDistZ: { modelDefault: 0, value: 0 },
-    steeringLock: { modelDefault: 0, value: 0 },
-    steeringLockRatio: { modelDefault: 0, value: 0 },
-    suspensionBiasFront: { modelDefault: 0, value: 0 },
-    suspensionBiasRear: { modelDefault: 0, value: 0 },
-    suspensionCompDamp: { modelDefault: 0, value: 0 },
-    suspensionForce: { modelDefault: 0, value: 0 },
-    suspensionLowerLimit: { modelDefault: 0, value: 0 },
-    suspensionRaise: { modelDefault: 0, value: 0 },
-    suspensionReboundDamp: { modelDefault: 0, value: 0 },
-    suspensionUpperLimit: { modelDefault: 0, value: 0 },
-    tractionBiasFront: { modelDefault: 0, value: 0 },
-    tractionBiasRear: { modelDefault: 0, value: 0 },
-    tractionCurveLateral: { modelDefault: 0, value: 0 },
-    tractionCurveLateralRatio: { modelDefault: 0, value: 0 },
-    tractionCurveMax: { modelDefault: 0, value: 0 },
-    tractionCurveMaxRatio: { modelDefault: 0, value: 0 },
-    tractionCurveMin: { modelDefault: 0, value: 0 },
-    tractionCurveMinRatio: { modelDefault: 0, value: 0 },
-    tractionLossMult: { modelDefault: 0, value: 0 },
-    tractionSpringDeltaMax: { modelDefault: 0, value: 0 },
-    tractionSpringDeltaMaxRatio: { modelDefault: 0, value: 0 },
-    weaponDamageMult: { modelDefault: 0, value: 0 },
-  };
+  } = {};
+
+  let tooltipText = "";
 
   const saveHandling = () => {
     if (!("alt" in window)) return;
@@ -85,15 +28,17 @@
     updatedProperties = {};
   };
 
-  const copyToClipboard = () => {
-    const savedData = {};
+  // TODO: implement a way to copy the handling to be actually useful
+  // for ex. generate the handling.meta or some custom loading thing
+  // const copyToClipboard = () => {
+  //   const savedData = {};
 
-    for (const [key, value] of Object.entries(handlingProperties)) {
-      savedData[key] = value.value;
-    }
+  //   for (const [key, value] of Object.entries(handlingProperties)) {
+  //     savedData[key] = value.value;
+  //   }
 
-    navigator.clipboard.writeText(JSON.stringify(savedData));
-  };
+  //   navigator.clipboard.writeText(JSON.stringify(savedData));
+  // };
 
   const resetToDefault = () => {
     if (!("alt" in window)) return;
@@ -104,6 +49,12 @@
 
     updatedProperties = {};
     alt.emit("handling:reset");
+  };
+
+  const setTooltipText = (key: string) => {
+    if (key && key in HANDLING_PROPERTY_DESCRIPTIONS)
+      tooltipText = HANDLING_PROPERTY_DESCRIPTIONS[key];
+    else tooltipText = "";
   };
 
   const fieldUpdate = (key: string) => {
@@ -129,11 +80,17 @@
   <div class="items">
     {#each Object.entries(handlingProperties) as [key, value]}
       <div class="item">
-        <label for={key}>{key}</label>
+        <!-- svelte-ignore a11y-mouse-events-have-key-events -->
+        <p
+          class="item-name"
+          on:mouseover={() => setTooltipText(key)}
+          on:mouseleave={() => setTooltipText(null)}
+        >
+          {key}
+        </p>
 
         <input
           type="text"
-          id={key}
           on:change={() => fieldUpdate(key)}
           bind:value={handlingProperties[key].value}
         />
@@ -141,19 +98,49 @@
     {/each}
   </div>
 
-  <div class="controls">
-    <button on:click={resetToDefault}>Reset</button>
-    <button on:click={copyToClipboard}>Copy</button>
-    <button on:click={saveHandling}>Save</button>
+  <div class="footer">
+    <p class="author">
+      Made by
+      <span
+        class="author-name"
+        on:click={() => window.open("https://github.com/szkiddaj")}
+        >@szkiddaj</span
+      > with ✨ and 👺
+    </p>
+
+    <div class="controls">
+      <button on:click={resetToDefault}>Reset</button>
+      <button on:click={saveHandling}>Save</button>
+    </div>
+
+    {#if typeof tooltipText === "string" && tooltipText !== ""}
+      <div class="tooltip-text">{@html tooltipText}</div>
+    {/if}
   </div>
 </div>
 
 <style lang="scss">
-  $scrollbar-width: 4px;
+  $scrollbar-width: 8px;
   $scrollbar-color: #333;
   $track-color: #222;
   $hover-color: #555;
   $window-radius: 8pt;
+
+  $input-width: 150px;
+  $total-width: 300px + $input-width;
+
+  $from-color: #81f6aa;
+  $to-color: #6dc2fb;
+
+  @keyframes gradientText {
+    0% {
+      background-position: 0% 50%;
+    }
+
+    100% {
+      background-position: 100% 50%;
+    }
+  }
 
   .hide {
     display: none;
@@ -165,10 +152,11 @@
     left: 50%;
     transform: translate(-50%, -50%);
 
-    width: 450px;
+    width: $total-width;
 
     h1.header {
       padding: 8pt 8pt;
+      transform: translateY(1px);
 
       font-family: "Inter", sans-serif;
       font-size: 18px;
@@ -193,6 +181,7 @@
 
       overflow-y: auto;
 
+      scroll-behavior: smooth;
       scrollbar-width: thin;
       scrollbar-color: $scrollbar-color $track-color;
 
@@ -217,14 +206,17 @@
         justify-content: space-between;
         align-items: center;
 
-        label {
+        .item-name {
+          position: relative;
+          display: inline-block;
+
           font-family: "Inter", sans-serif;
           font-size: 14px;
           font-weight: 400;
         }
 
         input {
-          width: 100px;
+          width: $input-width;
           padding: 6pt 8pt;
 
           border-radius: 6pt;
@@ -263,9 +255,9 @@
       }
     }
 
-    .controls {
+    .footer {
       display: flex;
-      justify-content: end;
+      justify-content: space-between;
       align-items: center;
 
       box-sizing: border-box;
@@ -276,37 +268,95 @@
       background: rgb(14, 14, 14);
       color: rgb(200, 200, 200);
 
-      button {
-        bottom: 0;
-        right: 0;
-
-        padding: 6pt 12pt;
-
-        border-radius: 6pt;
-        border: 2px solid rgb(32, 32, 32);
-
+      .author {
         font-family: "Inter", sans-serif;
-        font-size: 12px;
-        font-weight: bold;
+        font-size: 11px;
+        font-weight: 400;
 
+        opacity: 0.65;
         color: rgb(200, 200, 200);
+
+        .author-name {
+          font-weight: 600;
+
+          background: linear-gradient(to right, $from-color, $to-color);
+          background-clip: text;
+          -webkit-background-clip: text;
+
+          color: transparent;
+          animation: gradientText 3s linear infinite;
+
+          &:hover {
+            cursor: pointer;
+          }
+        }
+      }
+
+      .controls {
+        button {
+          bottom: 0;
+          right: 0;
+
+          padding: 6pt 12pt;
+
+          border-radius: 6pt;
+          border: 2px solid rgb(32, 32, 32);
+
+          font-family: "Inter", sans-serif;
+          font-size: 12px;
+          font-weight: bold;
+
+          color: rgb(200, 200, 200);
+          background: rgb(24, 24, 24);
+          transition:
+            100ms border ease-in-out,
+            100ms background ease-in-out,
+            100ms color ease-in-out;
+
+          &:hover {
+            cursor: pointer;
+
+            border: 2px solid rgb(64, 64, 64);
+            color: rgb(220, 220, 220);
+            background: rgb(48, 48, 48);
+          }
+
+          &:not(:last-child) {
+            margin-right: 4pt;
+          }
+        }
+      }
+    }
+
+    .tooltip-text {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translate(-50%, calc(100% + 10px));
+
+      width: calc(#{$total-width} - 16pt);
+      padding: 4pt 8pt;
+
+      border-radius: 6pt;
+      border: 2px solid rgb(32, 32, 32);
+
+      font-family: "Inter", sans-serif;
+      font-size: 12px;
+      font-weight: 400;
+
+      color: rgb(200, 200, 200);
+      background: rgb(14, 14, 14);
+      transition:
+        100ms border ease-in-out,
+        100ms background ease-in-out,
+        100ms color ease-in-out;
+
+      cursor: help;
+
+      &:hover {
+        border: 2px solid rgb(64, 64, 64);
+        color: rgb(220, 220, 220);
         background: rgb(24, 24, 24);
-        transition:
-          100ms border ease-in-out,
-          100ms background ease-in-out,
-          100ms color ease-in-out;
-
-        &:hover {
-          cursor: pointer;
-
-          border: 2px solid rgb(64, 64, 64);
-          color: rgb(220, 220, 220);
-          background: rgb(48, 48, 48);
-        }
-
-        &:not(:last-child) {
-          margin-right: 8pt;
-        }
       }
     }
   }

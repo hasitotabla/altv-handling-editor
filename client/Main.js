@@ -1,69 +1,10 @@
 import * as alt from "alt-client";
-
-const OPEN_KEY = 66; // B
-const VEHICLE_HANDLING_PROPERTIES = [
-  "acceleration",
-  "antiRollBarBiasFront",
-  "antiRollBarBiasRear",
-  "antiRollBarForce",
-  "brakeBiasFront",
-  "brakeBiasRear",
-  "brakeForce",
-  "camberStiffnesss",
-  "centreOfMassOffset",
-  "clutchChangeRateScaleDownShift",
-  "clutchChangeRateScaleUpShift",
-  "collisionDamageMult",
-  "damageFlags",
-  "deformationDamageMult",
-  "downforceModifier",
-  "driveBiasFront",
-  "driveInertia",
-  "driveMaxFlatVel",
-  "engineDamageMult",
-  "handBrakeForce",
-  "handlingFlags",
-  "inertiaMultiplier",
-  "initialDragCoeff",
-  "initialDriveForce",
-  "initialDriveGears",
-  "initialDriveMaxFlatVel",
-  "lowSpeedTractionLossMult",
-  "mass",
-  "modelFlags",
-  "monetaryValue",
-  "oilVolume",
-  "percentSubmerged",
-  "percentSubmergedRatio",
-  "petrolTankVolume",
-  "rollCentreHeightFront",
-  "rollCentreHeightRear",
-  "seatOffsetDistX",
-  "seatOffsetDistY",
-  "seatOffsetDistZ",
-  "steeringLock",
-  "steeringLockRatio",
-  "suspensionBiasFront",
-  "suspensionBiasRear",
-  "suspensionCompDamp",
-  "suspensionForce",
-  "suspensionLowerLimit",
-  "suspensionRaise",
-  "suspensionReboundDamp",
-  "suspensionUpperLimit",
-  "tractionBiasFront",
-  "tractionBiasRear",
-  "tractionCurveLateral",
-  "tractionCurveLateralRatio",
-  "tractionCurveMax",
-  "tractionCurveMaxRatio",
-  "tractionCurveMin",
-  "tractionCurveMinRatio",
-  "tractionLossMult",
-  "tractionSpringDeltaMax",
-  "tractionSpringDeltaMaxRatio",
-  "weaponDamageMult",
-];
+import {
+  OPEN_KEY,
+  VEHICLE_HANDLING_PROPERTIES,
+  castEditableHandlingToGame,
+  castGameToEditableHandling,
+} from "../shared/Shared.js";
 
 let isOpened = false;
 let webviewHandle;
@@ -94,19 +35,6 @@ function copyVehicleHandling() {
   alt.copyToClipboard(handlingString);
 }
 
-function castHandlingValue(value) {
-  switch (typeof value) {
-    case "object":
-      return JSON.stringify(value);
-
-    case "string":
-      return parseFloat(value) || value;
-
-    default:
-      return value;
-  }
-}
-
 function updateFormData() {
   if (!webviewHandle) return;
 
@@ -117,8 +45,8 @@ function updateFormData() {
     (acc, key) => ({
       ...acc,
       [key]: {
-        value: castHandlingValue(vehicle.handling[key] ?? -1),
-        modelDefault: castHandlingValue(vehicle.handling[key] ?? -1),
+        value: castGameToEditableHandling(vehicle.handling[key] ?? -1),
+        modelDefault: castGameToEditableHandling(vehicle.handling[key] ?? -1),
       },
     }),
     {}
@@ -174,10 +102,12 @@ alt.onServer("handling:sync", (vehicleId, data) => {
   if (!vehicle) return;
 
   for (const [key, value] of Object.entries(data)) {
-    if (vehicle.handling[key] === value) continue;
-
-    vehicle.handling[key] = parseFloat(value) || value;
+    const castedValue = castEditableHandlingToGame(value);
+    if (vehicle.handling[key] === castedValue) continue;
+    vehicle.handling[key] = castedValue;
   }
+
+  if (isOpened) updateFormData();
 });
 
 alt.onServer("handling:reset", (vehicleId, data) => {
@@ -185,4 +115,5 @@ alt.onServer("handling:reset", (vehicleId, data) => {
   if (!vehicle) return;
 
   vehicle.handling.reset();
+  if (isOpened) updateFormData();
 });
