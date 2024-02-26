@@ -14,7 +14,7 @@
       class="author-name"
       on:click={() => window.open("https://github.com/szkiddaj")}
       >@szkiddaj</span
-    > with ✨ and 👺agyrak
+    > with ✨ and 👺
   </p>
 
   <div class="controls">
