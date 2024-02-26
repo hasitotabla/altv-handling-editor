@@ -35,6 +35,10 @@ function copyVehicleHandling() {
   alt.copyToClipboard(handlingString);
 }
 
+function copyText(text) {
+  alt.copyToClipboard(text);
+}
+
 function updateFormData() {
   if (!webviewHandle) return;
 
@@ -45,8 +49,8 @@ function updateFormData() {
     (acc, key) => ({
       ...acc,
       [key]: {
-        value: castGameToEditableHandling(vehicle.handling[key] ?? -1),
-        modelDefault: castGameToEditableHandling(vehicle.handling[key] ?? -1),
+        value: vehicle.handling[key] ?? -1,
+        modelDefault: vehicle.handling[key] ?? -1,
       },
     }),
     {}
@@ -67,6 +71,7 @@ function openMenu() {
     handle.on("handling:update", onVehicleUpdate.bind(this));
     handle.on("handling:reset", resetVehicleHandling.bind(this));
     handle.on("handling:copy", copyVehicleHandling.bind(this));
+    handle.on("handling:copyText", copyText.bind(this));
 
     webviewHandle = handle;
   }

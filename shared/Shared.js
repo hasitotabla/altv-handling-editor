@@ -66,28 +66,17 @@ export const VEHICLE_HANDLING_PROPERTIES = [
 ];
 
 export function castGameToEditableHandling(value) {
-  switch (typeof value) {
-    case "object":
-      return JSON.stringify(value);
-
-    default:
-      return value;
-  }
+  return value;
 }
 
 export function castEditableHandlingToGame(value) {
-  try {
-    const parsed = JSON.parse(value);
-    if (!parsed) return parseFloat(value) || value;
+  let parsed;
+  if (typeof value === "string") parsed = JSON.parse(value);
+  if (!parsed) return parseFloat(value) || value;
 
-    if (typeof parsed === "object") {
-      if (!parsed.z) return new alt.Vector2(parsed.x, parsed.y);
-      return new alt.Vector3(parsed.x, parsed.y, parsed.z);
-    }
-
-    return value;
-  } catch (error) {
-    console.log(error);
+  if (typeof parsed === "object") {
+    if (!parsed.z) return new alt.Vector2(parsed.x, parsed.y);
+    return new alt.Vector3(parsed.x, parsed.y, parsed.z);
   }
 
   return value;

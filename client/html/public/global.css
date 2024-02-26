@@ -12,5 +12,7 @@ body {
   padding: 0;
   user-select: none;
 
+  font-family: "Inter", sans-serif;
+
   scroll-behavior: smooth;
 }
